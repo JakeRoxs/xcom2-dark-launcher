@@ -12,7 +12,7 @@ using Steamworks;
 using XCOM2Launcher.Classes;
 using XCOM2Launcher.Helper;
 using XCOM2Launcher.Mod;
-using XCOM2Launcher.PropertyGrid;
+using XCOM2Launcher.PropertyGrid0;
 using XCOM2Launcher.Steam;
 using XCOM2Launcher.XCOM;
 

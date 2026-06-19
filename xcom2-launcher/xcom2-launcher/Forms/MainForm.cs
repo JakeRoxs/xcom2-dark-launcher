@@ -52,20 +52,23 @@ namespace XCOM2Launcher.Forms
             // Init the argument checkboxes
             InitQuickArgumentsMenu(settings);
 
-/*
-            // Check for running downloads
-#if DEBUG
-            if (Settings.GetWorkshopPath() != null)
-            {
-                CheckSteamForNewMods();
+            darkModeToolStripMenuItem.Checked = Settings.DarkMode;
+            ThemeManager.Apply(this, Settings.DarkMode);
 
-                var t2 = new Timer();
-                t2.Tick += (sender, e) => { CheckSteamForNewMods(); };
-                t2.Interval = 30000;
-                t2.Start();
-            }
-#endif
-*/
+            /*
+                        // Check for running downloads
+            #if DEBUG
+                        if (Settings.GetWorkshopPath() != null)
+                        {
+                            CheckSteamForNewMods();
+
+                            var t2 = new Timer();
+                            t2.Tick += (sender, e) => { CheckSteamForNewMods(); };
+                            t2.Interval = 30000;
+                            t2.Start();
+                        }
+            #endif
+            */
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -886,5 +889,16 @@ namespace XCOM2Launcher.Forms
         }
 
         #endregion
+
+        private void darkModeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void darkModeToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            Settings.DarkMode = darkModeToolStripMenuItem.Checked;
+            ThemeManager.Apply(this, Settings.DarkMode);
+        }
     }
 }

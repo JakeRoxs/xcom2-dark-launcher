@@ -77,6 +77,7 @@ namespace XCOM2Launcher
             try
             {
                 Application.EnableVisualStyles();
+                ThemeManager.EnableAppDarkModeSupport();
                 Application.SetCompatibleTextRenderingDefault(false);
 
                 bool gameTypeSelected = InitialGameTypeSelection();

@@ -11,10 +11,14 @@ using XCOM2Launcher.Mod;
 using XCOM2Launcher.Serialization;
 using XCOM2Launcher.XCOM;
 
+
+
 namespace XCOM2Launcher
 {
+ 
     public class Settings
     {
+        public bool DarkMode { get; set; } = false;
         [JsonIgnore]
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(Settings));
         [JsonIgnore]
