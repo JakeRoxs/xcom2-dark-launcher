@@ -81,7 +81,7 @@
             this.openDiscordToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.runChimeraSquadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.error_provider = new System.Windows.Forms.ErrorProvider(this.components);
-            this.main_tabcontrol = new System.Windows.Forms.TabControl();
+            this.main_tabcontrol = new XCOM2Launcher.Forms.DarkTabControl();
             this.modlist_tab = new System.Windows.Forms.TabPage();
             this.horizontal_splitcontainer = new System.Windows.Forms.SplitContainer();
             this.modlist_ListObjectListView = new BrightIdeasSoftware.ObjectListView();
@@ -134,7 +134,7 @@
             this.modlist_FilterCueTextBox = new XCOM2Launcher.UserElements.CueTextBox();
             this.modinfo_groupbox = new XCOM2Launcher.Forms.DarkGroupBox();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
-            this.modinfo_tabcontrol = new System.Windows.Forms.TabControl();
+            this.modinfo_tabcontrol = new XCOM2Launcher.Forms.DarkTabControl();
             this.modinfo_details_tab = new System.Windows.Forms.TabPage();
             this.modinfo_info_CreatedLabel = new System.Windows.Forms.Label();
             this.modinfo_info_DescriptionLabel = new System.Windows.Forms.Label();
@@ -2306,7 +2306,7 @@
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ErrorProvider error_provider;
         private System.Windows.Forms.ToolStripMenuItem toolsToolStripMenuItem;
-        private System.Windows.Forms.TabControl main_tabcontrol;
+        private XCOM2Launcher.Forms.DarkTabControl main_tabcontrol;
         private System.Windows.Forms.TabPage modlist_tab;
         private System.Windows.Forms.TabPage conflicts_tab;
         private System.Windows.Forms.Label conflicts_log_label;
@@ -2321,7 +2321,7 @@
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.SplitContainer horizontal_splitcontainer;
         private XCOM2Launcher.Forms.DarkGroupBox modinfo_groupbox;
-        private System.Windows.Forms.TabControl modinfo_tabcontrol;
+        private XCOM2Launcher.Forms.DarkTabControl modinfo_tabcontrol;
         private System.Windows.Forms.TabPage modinfo_details_tab;
         private System.Windows.Forms.Label modinfo_info_DescriptionLabel;
         private System.Windows.Forms.TextBox modinfo_info_InstalledTextBox;

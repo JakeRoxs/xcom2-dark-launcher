@@ -1,4 +1,7 @@
-﻿using System;
+﻿using FastColoredTextBoxNS;
+using JR.Utils.GUI.Forms;
+using Steamworks;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -6,9 +9,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using FastColoredTextBoxNS;
-using JR.Utils.GUI.Forms;
-using Steamworks;
 using XCOM2Launcher.Classes;
 using XCOM2Launcher.Helper;
 using XCOM2Launcher.Mod;
@@ -47,7 +47,7 @@ namespace XCOM2Launcher.Forms
 
                 Reset();
             };
-            
+
             searchForModsToolStripMenuItem.Click += delegate
             {
                 Log.Info("Menu->File->Search for new mods");
@@ -57,18 +57,18 @@ namespace XCOM2Launcher.Forms
                     ShowModUpdateRunningMessageBox();
                     return;
                 }
-                
+
                 var importedMods = Settings.ImportMods();
-                
+
                 if (importedMods.Any())
                 {
                     UpdateMods(importedMods, () =>
                     {
-                        Invoke(new Action(() => 
+                        Invoke(new Action(() =>
                         {
                             modlist_ListObjectListView.EnsureModelVisible(importedMods.FirstOrDefault());
                         }));
-                        
+
                         return Task.CompletedTask;
                     });
                 }
@@ -77,13 +77,13 @@ namespace XCOM2Launcher.Forms
             updateEntriesToolStripMenuItem.Click += delegate
             {
                 Log.Info("Menu->File->Update mod info");
-                
+
                 if (IsModUpdateTaskRunning)
                 {
                     ShowModUpdateRunningMessageBox();
                     return;
                 }
-                
+
                 SetStatus("Updating all mods...");
 
                 var mods = Settings.Mods.All.ToList();
@@ -105,7 +105,8 @@ namespace XCOM2Launcher.Forms
             x2LogFileToolStripMenuItem.Visible = Program.XEnv.Game == GameId.X2;
             x2LogFileToolStripMenuItem.Click += delegate
             {
-                if (Program.XEnv is Xcom2Env env) {
+                if (Program.XEnv is Xcom2Env env)
+                {
                     Tools.StartProcess(env.LogFilePath);
                 }
             };
@@ -113,7 +114,8 @@ namespace XCOM2Launcher.Forms
             wotcLogFileToolStripMenuItem.Visible = Program.XEnv.Game == GameId.X2;
             wotcLogFileToolStripMenuItem.Click += delegate
             {
-                if (Program.XEnv is Xcom2Env env) {
+                if (Program.XEnv is Xcom2Env env)
+                {
                     Tools.StartProcess(env.LogFilePathWotC);
                 }
             };
@@ -121,7 +123,8 @@ namespace XCOM2Launcher.Forms
             chimeraLogFileToolStripMenuItem.Visible = Program.XEnv.Game == GameId.ChimeraSquad;
             chimeraLogFileToolStripMenuItem.Click += delegate
             {
-                if (Program.XEnv is XComChimeraSquadEnv env) {
+                if (Program.XEnv is XComChimeraSquadEnv env)
+                {
                     Tools.StartProcess(env.LogFilePath);
                 }
             };
@@ -230,7 +233,7 @@ namespace XCOM2Launcher.Forms
             manageCategoriesToolStripMenuItem.Click += ManageCategoriesToolStripMenuItem_Click;
 
             #endregion Menu->Options
-            
+
             #region Menu->Tools
 
             // -> Tools
@@ -345,7 +348,8 @@ namespace XCOM2Launcher.Forms
             };
         }
 
-        private void QuickArgumentItemClick(object sender, EventArgs e) {
+        private void QuickArgumentItemClick(object sender, EventArgs e)
+        {
             // Add or remove the respective argument from the argument list, depending on its check-state.
             if (sender is ToolStripMenuItem item)
             {
@@ -409,13 +413,13 @@ namespace XCOM2Launcher.Forms
                 Log.Info("Cancelled FormClosing because ModUpdateTask is still running");
 
                 ModUpdateCancelSource?.Cancel();
-                
+
                 // We asynchronously wait (can't block UI thread at this point) for the ModUpdateTask to complete
                 var waitForUpdateTaskToComplete = Task.Run(async () =>
                 {
                     await ModUpdateTask;
                 });
-                
+
                 // Close the form as soon as the ModUpdateTask finished
                 waitForUpdateTaskToComplete.ContinueWith((x) =>
                 {
@@ -429,7 +433,7 @@ namespace XCOM2Launcher.Forms
                 e.Cancel = true;
                 return;
             }
-            
+
             Log.Info("MainForm is about to close");
 
             // Save dimensions
@@ -471,7 +475,7 @@ namespace XCOM2Launcher.Forms
                 CheckFileExists = true,
                 Multiselect = false,
             };
-            
+
             if (dialog.ShowDialog() != DialogResult.OK)
                 return;
 
@@ -870,7 +874,7 @@ namespace XCOM2Launcher.Forms
                 UpdateDependencyInformation(mod);
             }
         }
-        
+
         private void modInfoNotesText_TextChanged(object sender, EventArgs e)
         {
             if (CurrentMod != null)

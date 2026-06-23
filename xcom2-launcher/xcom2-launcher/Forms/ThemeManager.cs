@@ -1,9 +1,9 @@
+using BrightIdeasSoftware;
+using Microsoft.Win32;
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using BrightIdeasSoftware;
-using Microsoft.Win32;
 
 namespace XCOM2Launcher.Forms
 {
@@ -161,6 +161,7 @@ namespace XCOM2Launcher.Forms
 
                 case ObjectListView olv:
                     ApplyToObjectListView(olv, dark);
+                    olv.Refresh();
                     break;
 
                 case DataGridView grid:
@@ -174,7 +175,7 @@ namespace XCOM2Launcher.Forms
                 case TextBoxBase tb: // covers TextBox and RichTextBox
                     tb.BackColor = dark ? ControlBackgroundAlt : SystemColors.Window;
                     tb.ForeColor = dark ? Text : SystemColors.WindowText;
-                    tb.BorderStyle = dark ? BorderStyle.FixedSingle : BorderStyle.Fixed3D;
+                    tb.BorderStyle = dark ? BorderStyle.None : BorderStyle.Fixed3D;
                     break;
 
                 case ListBox lb:
@@ -247,7 +248,7 @@ namespace XCOM2Launcher.Forms
             olv.HeaderUsesThemes = !dark;
             olv.HeaderFormatStyle = dark ? BuildDarkHeaderStyle() : null;
 
-            olv.BorderStyle = dark ? BorderStyle.FixedSingle : BorderStyle.Fixed3D;
+            olv.BorderStyle = dark ? BorderStyle.None : BorderStyle.Fixed3D;
         }
 
         private static HeaderFormatStyle BuildDarkHeaderStyle()
@@ -269,7 +270,7 @@ namespace XCOM2Launcher.Forms
             grid.BackgroundColor = dark ? ControlBackgroundAlt : SystemColors.Window;
             grid.GridColor = dark ? Border : SystemColors.ControlDark;
             grid.EnableHeadersVisualStyles = !dark;
-            grid.BorderStyle = dark ? BorderStyle.FixedSingle : BorderStyle.Fixed3D;
+            grid.BorderStyle = dark ? BorderStyle.None : BorderStyle.Fixed3D;
 
             grid.DefaultCellStyle.BackColor = dark ? ControlBackgroundAlt : SystemColors.Window;
             grid.DefaultCellStyle.ForeColor = dark ? Text : SystemColors.WindowText;
@@ -315,16 +316,28 @@ namespace XCOM2Launcher.Forms
             tabs.BackColor = dark ? WindowBackground : SystemColors.Control;
             tabs.ForeColor = dark ? Text : SystemColors.ControlText;
 
-            tabs.DrawMode = dark ? TabDrawMode.OwnerDrawFixed : TabDrawMode.Normal;
-
-            tabs.DrawItem -= DrawDarkTabItem;
-            if (dark)
-                tabs.DrawItem += DrawDarkTabItem;
-
             foreach (TabPage page in tabs.TabPages)
             {
                 page.BackColor = dark ? WindowBackground : SystemColors.Control;
                 page.ForeColor = dark ? Text : SystemColors.ControlText;
+            }
+
+            if (tabs is DarkTabControl dtc)
+            {
+                // DarkTabControl's OnPaint override handles everything - both the tab
+                // header buttons and the page-content frame - in one pass. Setting
+                // DrawMode here would conflict with that and break the painting.
+                dtc.UseDarkTheme = dark;
+            }
+            else
+            {
+                // Best-effort fallback for any plain TabControl not converted to
+                // DarkTabControl. OwnerDrawFixed covers the tab header buttons only;
+                // the page-content frame stays OS-themed.
+                tabs.DrawMode = dark ? TabDrawMode.OwnerDrawFixed : TabDrawMode.Normal;
+                tabs.DrawItem -= DrawDarkTabItem;
+                if (dark)
+                    tabs.DrawItem += DrawDarkTabItem;
             }
 
             tabs.Invalidate();
