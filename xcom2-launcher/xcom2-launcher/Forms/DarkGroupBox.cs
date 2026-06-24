@@ -27,8 +27,8 @@ namespace XCOM2Launcher.Forms
             var g = e.Graphics;
             g.Clear(BackColor);
 
-            using (var textBrush = new SolidBrush(ForeColor))
-                g.DrawString(Text, Font, textBrush, 6, 0);
+            using var textBrush = new SolidBrush(ForeColor);
+            g.DrawString(Text, Font, textBrush, 6, 0);
         }
     }
 }

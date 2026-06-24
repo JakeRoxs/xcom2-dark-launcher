@@ -494,56 +494,54 @@ namespace XCOM2Launcher
 
             try
             {
-                using (var client = new System.Net.WebClient())
+                using var client = new System.Net.WebClient();
+                client.Headers.Add("User-Agent: Other");
+                GitHub.Release release;
+
+                if (Settings.Instance.CheckForPreReleaseUpdates)
                 {
-                    client.Headers.Add("User-Agent: Other");
-                    GitHub.Release release;
+                    Log.Info("Pre-Release updates enabled");
+                    // fetch all releases including pre-releases and select the first/newest 
+                    var jsonAllReleases = client.DownloadString("https://api.github.com/repos/X2CommunityCore/xcom2-launcher/releases");
+                    var allReleases = JsonConvert.DeserializeObject<List<GitHub.Release>>(jsonAllReleases);
+                    release = allReleases.FirstOrDefault();
+                }
+                else
+                {
+                    // fetch latest non-pre-release
+                    var json = client.DownloadString("https://api.github.com/repos/X2CommunityCore/xcom2-launcher/releases/latest");
+                    release = JsonConvert.DeserializeObject<GitHub.Release>(json);
+                }
 
-                    if (Settings.Instance.CheckForPreReleaseUpdates)
-                    {
-                        Log.Info("Pre-Release updates enabled");
-                        // fetch all releases including pre-releases and select the first/newest 
-                        var jsonAllReleases = client.DownloadString("https://api.github.com/repos/X2CommunityCore/xcom2-launcher/releases");
-                        var allReleases = JsonConvert.DeserializeObject<List<GitHub.Release>>(jsonAllReleases);
-                        release = allReleases.FirstOrDefault();
-                    }
-                    else
-                    {
-                        // fetch latest non-pre-release
-                        var json = client.DownloadString("https://api.github.com/repos/X2CommunityCore/xcom2-launcher/releases/latest");
-                        release = JsonConvert.DeserializeObject<GitHub.Release>(json);
-                    }
+                if (release == null)
+                {
+                    Log.Warn("No release information found");
+                    return false;
+                }
 
-                    if (release == null)
-                    {
-                        Log.Warn("No release information found");
+                bool parsingSucceeded = SemVersion.TryParse(GitVersionInfo.SemVer, SemVersionStyles.Any, out SemVersion currentVersion);
+                parsingSucceeded &= SemVersion.TryParse(release.tag_name.TrimStart('v'), SemVersionStyles.Any, out SemVersion newVersion);
+
+                if (parsingSucceeded)
+                {
+                    // If not explicitly enabled, we ignore alpha versions.
+                    if (!Settings.Instance.IncludeAlphaVersions && newVersion.Prerelease.Contains("alpha"))
                         return false;
-                    }
 
-                    bool parsingSucceeded = SemVersion.TryParse(GitVersionInfo.SemVer, SemVersionStyles.Any, out SemVersion currentVersion);
-                    parsingSucceeded &= SemVersion.TryParse(release.tag_name.TrimStart('v'), SemVersionStyles.Any, out SemVersion newVersion);
-
-                    if (parsingSucceeded)
+                    if (currentVersion.CompareSortOrderTo(newVersion) == -1)
                     {
-                        // If not explicitly enabled, we ignore alpha versions.
-                        if (!Settings.Instance.IncludeAlphaVersions && newVersion.Prerelease.Contains("alpha"))
-                            return false;
-
-                        if (currentVersion.CompareSortOrderTo(newVersion) == -1)
-                        {
-                            // New version available
-                            Log.Info("New version available " + newVersion);
-                            using var dlg = new UpdateAvailableDialog(release, currentVersion, newVersion);
-                            dlg.ShowDialog();
-                            return true;
-                        }
+                        // New version available
+                        Log.Info("New version available " + newVersion);
+                        using var dlg = new UpdateAvailableDialog(release, currentVersion, newVersion);
+                        dlg.ShowDialog();
+                        return true;
                     }
-                    else
-                    {
-                        var message = $"{nameof(CheckForUpdate)}: Error parsing release version information '{release.tag_name}'.";
-                        Log.Error(message);
-                        Debug.Fail(message);
-                    }
+                }
+                else
+                {
+                    var message = $"{nameof(CheckForUpdate)}: Error parsing release version information '{release.tag_name}'.";
+                    Log.Error(message);
+                    Debug.Fail(message);
                 }
             }
             catch (System.Net.WebException ex)

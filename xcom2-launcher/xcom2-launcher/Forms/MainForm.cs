@@ -70,6 +70,11 @@ namespace XCOM2Launcher.Forms
             #endif
             */
         }
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
+            ThemeManager.Apply(this, Settings.DarkMode);
+        }
 
         private void MainForm_Load(object sender, EventArgs e)
         {

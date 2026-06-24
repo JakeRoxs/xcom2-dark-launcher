@@ -44,47 +44,45 @@ namespace XCOM2Launcher.XCOM
 
         public void Load(string file)
         {
-            using (var stream = File.Exists(file) ? new FileStream(file, FileMode.Open) : GenerateStreamFromString(file))
-            using (var reader = new StreamReader(stream))
+            using var stream = File.Exists(file) ? new FileStream(file, FileMode.Open) : GenerateStreamFromString(file);
+            using var reader = new StreamReader(stream);
+            var currentSection = "";
+            while (!reader.EndOfStream)
             {
-                var currentSection = "";
-                while (!reader.EndOfStream)
-                {
-                    var line = reader.ReadLine()?.Trim();
+                var line = reader.ReadLine()?.Trim();
 
-                    if (string.IsNullOrEmpty(line))
+                if (string.IsNullOrEmpty(line))
+                    continue;
+
+                // section header
+                if (line.StartsWith("[") && line.EndsWith("]"))
+                {
+                    currentSection = line.Substring(1, line.Length - 2).Trim();
+                }
+                else
+                {
+                    // entries
+                    var pos = line.IndexOf('=');
+
+                    if (pos == -1)
+                        // invalid syntax, previous line possibly missing \\
+                        // -> skip
                         continue;
 
-                    // section header
-                    if (line.StartsWith("[") && line.EndsWith("]"))
-                    {
-                        currentSection = line.Substring(1, line.Length - 2).Trim();
-                    }
-                    else
-                    {
-                        // entries
-                        var pos = line.IndexOf('=');
+                    var currentKey = line.Substring(0, pos);
+                    var currentValue = line.Substring(pos + 1);
 
-                        if (pos == -1)
-                            // invalid syntax, previous line possibly missing \\
-                            // -> skip
-                            continue;
-
-                        var currentKey = line.Substring(0, pos);
-                        var currentValue = line.Substring(pos + 1);
-
-                        if (currentKey.StartsWith(";"))
-                            continue;
+                    if (currentKey.StartsWith(";"))
+                        continue;
 
 
-                        // multi line
-                        while (currentValue.Length > 2 && currentValue.Substring(currentValue.Length - 2) == "\\\\")
-                            currentValue = currentValue.Substring(0, currentValue.Length - 2) + "\n" + reader.ReadLine();
+                    // multi line
+                    while (currentValue.Length > 2 && currentValue.Substring(currentValue.Length - 2) == "\\\\")
+                        currentValue = currentValue.Substring(0, currentValue.Length - 2) + "\n" + reader.ReadLine();
 
-                        currentValue = currentValue.Replace("%GAME%", "XCom");
+                    currentValue = currentValue.Replace("%GAME%", "XCom");
 
-                        Add(currentSection, currentKey.TrimEnd(), currentValue.TrimStart());
-                    }
+                    Add(currentSection, currentKey.TrimEnd(), currentValue.TrimStart());
                 }
             }
         }
@@ -100,26 +98,24 @@ namespace XCOM2Launcher.XCOM
                 Directory.CreateDirectory(dir);
 
             // Write File
-            using (var stream = new FileStream(Path, FileMode.Create))
-            using (var writer = new StreamWriter(stream))
+            using var stream = new FileStream(Path, FileMode.Create);
+            using var writer = new StreamWriter(stream);
+            foreach (var section in Entries.Where(section => section.Value.Count > 0))
             {
-                foreach (var section in Entries.Where(section => section.Value.Count > 0))
+                writer.WriteLine($"[{section.Key}]");
+
+                foreach (var entry in section.Value)
                 {
-                    writer.WriteLine($"[{section.Key}]");
-
-                    foreach (var entry in section.Value)
+                    foreach (var val in entry.Value)
                     {
-                        foreach (var val in entry.Value)
-                        {
-                            writer.Write(entry.Key);
-                            writer.Write("=");
-                            writer.Write(val.Replace("\n", "\\\\\n"));
-                            writer.WriteLine();
-                        }
+                        writer.Write(entry.Key);
+                        writer.Write("=");
+                        writer.Write(val.Replace("\n", "\\\\\n"));
+                        writer.WriteLine();
                     }
-
-                    writer.WriteLine();
                 }
+
+                writer.WriteLine();
             }
         }
 

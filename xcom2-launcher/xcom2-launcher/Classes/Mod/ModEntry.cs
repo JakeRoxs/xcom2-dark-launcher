@@ -527,10 +527,8 @@ namespace XCOM2Launcher.Mod
 
             try
             {
-                using (var stream = new StreamWriter(fullpath))
-                {
-                    stream.Write(contents);
-                }
+                using var stream = new StreamWriter(fullpath);
+                stream.Write(contents);
             }
             catch (UnauthorizedAccessException ex)
             {

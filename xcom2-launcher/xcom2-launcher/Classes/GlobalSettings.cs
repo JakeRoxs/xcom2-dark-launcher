@@ -82,24 +82,20 @@ namespace XCOM2Launcher.Classes
 
                 try
                 {
-                    using (var stream = File.OpenRead(fileLocation))
+                    using var stream = File.OpenRead(fileLocation);
+                    using var reader = new StreamReader(stream);
+                    var serializer = new JsonSerializer();
+
+                    foreach (var converter in GetRequiredConverters())
                     {
-                        using (var reader = new StreamReader(stream))
-                        {
-                            var serializer = new JsonSerializer();
+                        serializer.Converters.Add(converter);
+                    }
 
-                            foreach (var converter in GetRequiredConverters())
-                            {
-                                serializer.Converters.Add(converter);
-                            }
+                    settings = (GlobalSettings)serializer.Deserialize(reader, typeof(GlobalSettings));
 
-                            settings = (GlobalSettings)serializer.Deserialize(reader, typeof(GlobalSettings));
-
-                            if (settings == null)
-                            {
-                                Log.Warn("Deserialization result was NULL.");
-                            }
-                        }
+                    if (settings == null)
+                    {
+                        Log.Warn("Deserialization result was NULL.");
                     }
                 }
                 catch (JsonSerializationException ex)

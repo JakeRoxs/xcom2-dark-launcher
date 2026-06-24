@@ -490,12 +490,10 @@ namespace XCOM2Launcher.Forms
                 Lines lines = new Lines();
                 try
                 {
-                    using (StringReader reader = new StringReader(s))
-                    {
-                        string line;
-                        while ((line = reader.ReadLine()) != null)
-                            lines.Add(new Line(line));
-                    }
+                    using StringReader reader = new StringReader(s);
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                        lines.Add(new Line(line));
                 }
                 catch (Exception) { }
                 return lines;

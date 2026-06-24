@@ -1,9 +1,9 @@
-using BrightIdeasSoftware;
-using Microsoft.Win32;
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using BrightIdeasSoftware;
+using Microsoft.Win32;
 
 namespace XCOM2Launcher.Forms
 {
@@ -67,10 +67,13 @@ namespace XCOM2Launcher.Forms
 
         private static void ApplyDarkTitleBar(Form form, bool dark)
         {
-            if (Environment.OSVersion.Version.Major < 10 || !form.IsHandleCreated)
+            if (!form.IsHandleCreated)
                 return;
 
             int useDark = dark ? 1 : 0;
+            // Try the modern attribute first (Windows 10 20H1+),
+            // fall back to the older one (1809-1909).
+            // If neither is supported the calls return non-zero and we just no-op.
             if (DwmSetWindowAttribute(form.Handle, DWMWA_USE_IMMERSIVE_DARK_MODE, ref useDark, sizeof(int)) != 0)
                 DwmSetWindowAttribute(form.Handle, DWMWA_USE_IMMERSIVE_DARK_MODE_OLD, ref useDark, sizeof(int));
         }
@@ -161,7 +164,6 @@ namespace XCOM2Launcher.Forms
 
                 case ObjectListView olv:
                     ApplyToObjectListView(olv, dark);
-                    olv.Refresh();
                     break;
 
                 case DataGridView grid:
@@ -218,6 +220,20 @@ namespace XCOM2Launcher.Forms
 
             foreach (Control child in control.Controls)
                 ApplyToControl(child, dark);
+
+            // ContextMenuStrip is a floating component, not a child control, so the
+            // recursive walk above never reaches it. Check each control explicitly.
+            if (control.ContextMenuStrip != null)
+                ApplyToContextMenuStrip(control.ContextMenuStrip, dark);
+        }
+
+        public static void ApplyToContextMenuStrip(ContextMenuStrip cms, bool dark)
+        {
+            cms.Renderer = dark ? new DarkToolStripRenderer() : new ToolStripProfessionalRenderer();
+            cms.BackColor = dark ? ControlBackground : SystemColors.Control;
+            cms.ForeColor = dark ? Text : SystemColors.ControlText;
+            foreach (ToolStripItem item in cms.Items)
+                ApplyToToolStripItem(item, dark);
         }
 
         private static void ApplyToToolStripItem(ToolStripItem item, bool dark)

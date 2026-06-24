@@ -168,13 +168,11 @@ namespace XCOM2Launcher
 
             using (var stream = File.OpenRead(file))
             {
-                using (var reader = new StreamReader(stream))
-                {
-                    var serializer = new JsonSerializer();
-                    serializer.Converters.Add(new ModListConverter());
+                using var reader = new StreamReader(stream);
+                var serializer = new JsonSerializer();
+                serializer.Converters.Add(new ModListConverter());
 
-                    settings = (Settings)serializer.Deserialize(reader, typeof(Settings));
-                }
+                settings = (Settings)serializer.Deserialize(reader, typeof(Settings));
             }
 
             // for backwards compatibility, convert obsolete Arguments string to individual list entries and set it to ""

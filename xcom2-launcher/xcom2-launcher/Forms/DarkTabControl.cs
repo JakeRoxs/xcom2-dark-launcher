@@ -30,8 +30,8 @@ namespace XCOM2Launcher.Forms
                 // Mark the window as valid so Windows doesn't keep requesting redraws,
                 // then do all rendering ourselves via Graphics.FromHwnd.
                 ValidateRect(Handle, IntPtr.Zero);
-                using (var g = Graphics.FromHwnd(Handle))
-                    Render(g);
+                using var g = Graphics.FromHwnd(Handle);
+                Render(g);
                 return; // Skip base.WndProc - the native border never gets drawn.
             }
 

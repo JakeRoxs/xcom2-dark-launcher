@@ -865,7 +865,9 @@ namespace XCOM2Launcher.Forms
 
         private ContextMenuStrip CreateModListContextMenu(ModEntry m, OLVListItem currentItem)
         {
+          
             var menu = new ContextMenuStrip();
+            ThemeManager.ApplyToContextMenuStrip(menu, Settings.DarkMode);
 
             if (m?.ID == null)
                 return menu;
