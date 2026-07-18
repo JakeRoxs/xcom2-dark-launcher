@@ -32,10 +32,6 @@ jobs:
           path: ${{ runner.temp }}\scanner
           key: ${{ runner.os }}-sonar-scanner
           restore-keys: ${{ runner.os }}-sonar-scanner
-      - name: Set up NuGet
-        uses: NuGet/setup-nuget@v2.0.1
-      - name: Set up MSBuild
-        uses: microsoft/setup-msbuild@v2.0.0
       - name: Install SonarQube scanner
         if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
         shell: powershell
@@ -44,9 +40,7 @@ jobs:
           dotnet tool update dotnet-sonarscanner --tool-path ${{ runner.temp }}\scanner
       - name: Build and analyze
         shell: powershell
-        working-directory: xcom2-launcher
         run: |
-          nuget restore xcom2-launcher.sln
-          ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"JakeRoxs_xcom2-dark-launcher_9c261805-1f31-4bce-a482-ab8dce0a40bb" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}"
-          msbuild xcom2-launcher.sln /t:Rebuild /p:Configuration=Release
+          ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"JakeRoxs_xcom2-aaml_a670e370-ec12-40c3-82fe-cfa44d5ef78e" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}"
+          dotnet build
           ${{ runner.temp }}\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
